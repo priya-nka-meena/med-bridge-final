@@ -13,8 +13,9 @@ const SPECIALITY_MAP = {
   trauma:         'Trauma & Emergency',
 };
 
-export default function HospitalCard({ hospital }) {
-  const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${hospital.lat},${hospital.lng}`;
+export default function HospitalCard({ hospital, isSelected = false, onSelect }) {
+  const gmapsUrl = `https://www.google.com/maps/search/?api=1&query=${hospital.lat},${hospital.lng}`;
+  const osmUrl   = `https://www.openstreetmap.org/?mlat=${hospital.lat}&mlon=${hospital.lng}#map=15/${hospital.lat}/${hospital.lng}`;
 
   return (
     <div className="hospital-card">
@@ -31,6 +32,13 @@ export default function HospitalCard({ hospital }) {
       <p className="hospital-card__meta">🕐 {hospital.timings}</p>
       <p className="hospital-card__meta">📞 {hospital.phone}</p>
 
+      {/* Precise coordinates badge */}
+      {hospital.lat && hospital.lng && (
+        <p className="hospital-card__coords">
+          🌐 {hospital.lat.toFixed(4)}°N, {hospital.lng.toFixed(4)}°E
+        </p>
+      )}
+
       {Array.isArray(hospital.speciality) && hospital.speciality.length > 0 && (
         <div className="hospital-card__tags">
           {hospital.speciality.slice(0, 4).map((s, i) => (
@@ -41,14 +49,19 @@ export default function HospitalCard({ hospital }) {
         </div>
       )}
 
-      <a
-        href={mapsUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="hospital-card__btn"
-      >
-        🗺 Get Directions
-      </a>
+      <div className="hospital-card__actions">
+        {onSelect && (
+          <button type="button" onClick={() => onSelect(hospital)} className="hospital-card__btn hospital-card__btn--select">
+            {isSelected ? '✓ Selected Hospital' : 'Select Hospital'}
+          </button>
+        )}
+        <a href={gmapsUrl} target="_blank" rel="noopener noreferrer" className="hospital-card__btn hospital-card__btn--primary">
+          🗺️ Google Maps
+        </a>
+        <a href={osmUrl}   target="_blank" rel="noopener noreferrer" className="hospital-card__btn hospital-card__btn--secondary">
+          🌍 OpenStreetMap
+        </a>
+      </div>
     </div>
   );
 }

@@ -1,14 +1,26 @@
 import React, { useState } from 'react';
 import ConditionBadge from './ConditionBadge';
 
-export default function SchemeCard({ scheme, lang = 'en', isTop = false }) {
+export default function SchemeCard({
+  scheme,
+  lang = 'en',
+  isTop = false,
+  isSelected = false,
+  onSelect,
+  showEligibility = false,
+}) {
   const [open, setOpen] = useState(false);
 
   const name        = lang === 'hi' ? scheme.name_hi        : scheme.name_en;
   const description = lang === 'hi' ? scheme.description_hi : scheme.description_en;
+  const eligibility = [
+    scheme.bpl_required ? 'BPL card required' : 'Open to all families',
+    scheme.income_limit ? `Income up to Rs ${Number(scheme.income_limit).toLocaleString('en-IN')}` : 'No income cap',
+    scheme.states?.includes('all') ? 'Available across India' : `Available in: ${(scheme.states || []).join(', ')}`,
+  ];
 
   return (
-    <div className={`scheme-card ${isTop ? 'scheme-card--top' : ''}`}>
+    <div className={`scheme-card ${isTop ? 'scheme-card--top' : ''} ${isSelected ? 'scheme-card--selected' : ''}`}>
       {isTop && <div className="scheme-card__top-tag">⭐ Best Match</div>}
 
       <div className="scheme-card__header">
@@ -35,6 +47,20 @@ export default function SchemeCard({ scheme, lang = 'en', isTop = false }) {
       )}
 
       <p className="scheme-card__desc">{description}</p>
+
+      {showEligibility && (
+        <div className="scheme-card__eligibility">
+          {eligibility.map((point) => (
+            <p key={point}>• {point}</p>
+          ))}
+        </div>
+      )}
+
+      {onSelect && (
+        <button className="scheme-card__select" onClick={() => onSelect(scheme)}>
+          {isSelected ? '✓ Selected Scheme' : 'Select This Scheme'}
+        </button>
+      )}
 
       <button
         className="scheme-card__toggle"
