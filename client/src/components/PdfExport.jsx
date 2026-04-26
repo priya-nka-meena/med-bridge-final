@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 
 export default function PdfExport({ scheme, hospital, condition, query }) {
   const [generating, setGenerating] = useState(false);
@@ -98,7 +98,7 @@ export default function PdfExport({ scheme, hospital, condition, query }) {
       doc.text('Required Documents', 14, y);
       y += 5;
 
-      doc.autoTable({
+      autoTable(doc, {
         startY: y,
         head: [['#', 'Document Required']],
         body: (scheme.documents || []).map((d, i) => [i + 1, d]),

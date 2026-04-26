@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
+import 'leaflet-routing-machine';
 
 // Fix default marker icons broken by Vite bundler
 delete L.Icon.Default.prototype._getIconUrl;
@@ -30,7 +31,49 @@ function RecenterMap({ center }) {
   return null;
 }
 
+function RoutingControl({ userCoords, selectedHospital }) {
+  const map = useMap();
+  const [route, setRoute] = useState(null);
+
+  useEffect(() => {
+    if (userCoords && selectedHospital) {
+      // Remove existing route if any
+      if (route) {
+        map.removeControl(route);
+      }
+
+      // Create new routing control
+      const routingControl = L.Routing.control({
+        waypoints: [
+          L.latLng(userCoords.lat, userCoords.lng),
+          L.latLng(selectedHospital.lat, selectedHospital.lng)
+        ],
+        routeWhileDragging: false,
+        addWaypoints: false,
+        createMarker: function() { return null; }, // Hide default markers
+        lineOptions: {
+          styles: [{ color: '#1a73e8', weight: 4, opacity: 0.7 }]
+        },
+        show: false, // Hide instructions panel
+        fitSelectedRoutes: false
+      }).addTo(map);
+
+      setRoute(routingControl);
+
+      return () => {
+        if (routingControl) {
+          map.removeControl(routingControl);
+        }
+      };
+    }
+  }, [userCoords, selectedHospital, map]);
+
+  return null;
+}
+
 export default function HospitalMapLeaflet({ hospitals, userCoords }) {
+  const [selectedHospital, setSelectedHospital] = useState(null);
+  
   const defaultCenter = userCoords
     ? [userCoords.lat, userCoords.lng]
     : hospitals.length > 0 && hospitals[0].lat
@@ -53,6 +96,10 @@ export default function HospitalMapLeaflet({ hospitals, userCoords }) {
         />
 
         <RecenterMap center={defaultCenter} />
+        
+        {userCoords && selectedHospital && (
+          <RoutingControl userCoords={userCoords} selectedHospital={selectedHospital} />
+        )}
 
         {userCoords && (
           <Marker position={[userCoords.lat, userCoords.lng]} icon={USER_ICON}>
@@ -63,7 +110,14 @@ export default function HospitalMapLeaflet({ hospitals, userCoords }) {
         )}
 
         {validHospitals.map((h, i) => (
-          <Marker key={h.id || i} position={[h.lat, h.lng]} icon={HOSPITAL_ICON}>
+          <Marker 
+            key={h.id || i} 
+            position={[h.lat, h.lng]} 
+            icon={HOSPITAL_ICON}
+            eventHandlers={{
+              click: () => setSelectedHospital(h)
+            }}
+          >
             <Popup>
               <div style={{ minWidth: 180 }}>
                 <strong style={{ fontSize: 13 }}>{h.name}</strong><br />
@@ -76,18 +130,31 @@ export default function HospitalMapLeaflet({ hospitals, userCoords }) {
                   </span>
                 )}
                 <br />
+                {userCoords && (
+                  <button
+                    onClick={() => setSelectedHospital(h)}
+                    style={{
+                      display: 'inline-block', marginTop: 8,
+                      padding: '5px 12px', background: selectedHospital?.id === h.id ? '#059669' : '#1a73e8', color: '#fff',
+                      borderRadius: 6, fontSize: 12, fontWeight: 700,
+                      border: 'none', cursor: 'pointer', marginRight: 4
+                    }}
+                  >
+                    {selectedHospital?.id === h.id ? '✓ Route Shown' : '🗺️ Show Route'}
+                  </button>
+                )}
                 <a
                   href={`https://www.google.com/maps/dir/?api=1&destination=${h.lat},${h.lng}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
                     display: 'inline-block', marginTop: 8,
-                    padding: '5px 12px', background: '#1a73e8', color: '#fff',
+                    padding: '5px 12px', background: '#64748b', color: '#fff',
                     borderRadius: 6, fontSize: 12, fontWeight: 700,
                     textDecoration: 'none',
                   }}
                 >
-                  🗺️ Get Directions
+                  Google Maps
                 </a>
               </div>
             </Popup>

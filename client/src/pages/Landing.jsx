@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import translations from '../translations';
+import schemesCatalog from '../data/schemesCatalog';
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -11,9 +12,9 @@ export default function Landing() {
   function handleSearch(e) {
     e.preventDefault();
     if (search.trim()) {
-      navigate('/', { state: { prefillQuery: search.trim(), lang } });
+      navigate('/home', { state: { prefillQuery: search.trim(), lang } });
     } else {
-      navigate('/');
+      navigate('/home');
     }
   }
 
@@ -62,22 +63,13 @@ export default function Landing() {
           </h1>
           <p className="landing__hero-sub">{t.landingHeroSub}</p>
 
-          {/* Search bar */}
-          <form className="landing__search-bar" onSubmit={handleSearch}>
-            <span className="landing__search-icon">🔍</span>
-            <input
-              type="text"
-              className="landing__search-input"
-              placeholder={t.landingSearch}
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-            />
-            <button type="submit" className="landing__search-submit">
-              {lang === 'hi' ? 'खोजें' : 'Search'}
-            </button>
-          </form>
+          <button 
+            className="landing__schemes-btn" 
+            onClick={() => navigate('/all-schemes')}
+          >
+            📋 {t.exploreSchemes}
+          </button>
 
-          {/* Government schemes link */}
           <a
             href="https://www.india.gov.in/my-government/schemes/search?schemeCategory=5&schemeCategoryName=Health%20%26%20Wellness"
             target="_blank"
@@ -87,13 +79,11 @@ export default function Landing() {
             🏛️ {t.exploreSchemes}
           </a>
 
-          {/* Primary CTA */}
-          <button className="landing__cta" onClick={() => navigate('/')}>
+          <button className="landing__cta" onClick={() => navigate('/home')}>
             {t.landingCta}
           </button>
         </div>
 
-        {/* Stats strip */}
         <div className="landing__stats">
           <div className="landing__stat">
             <span className="landing__stat-num">{t.stat1}</span>
@@ -112,7 +102,51 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ── HOW IT WORKS ── */}
+      <section className="landing__section">
+        <div className="landing__section-inner">
+          <h2 className="landing__section-title">{lang === 'hi' ? 'लोकप्रिय स्वास्थ्य योजनाएं' : 'Popular Health Schemes'}</h2>
+          <div className="schemes-showcase">
+            <div className="schemes-scroll-controls">
+              <button 
+                className="schemes-scroll-btn schemes-scroll-btn--left"
+                onClick={() => document.querySelector('.schemes-scroll').scrollBy({ left: -300, behavior: 'smooth' })}
+              >
+                ←
+              </button>
+              <button 
+                className="schemes-scroll-btn schemes-scroll-btn--right"
+                onClick={() => document.querySelector('.schemes-scroll').scrollBy({ left: 300, behavior: 'smooth' })}
+              >
+                →
+              </button>
+            </div>
+            <div className="schemes-scroll">
+              {schemesCatalog.map((scheme, i) => (
+                <div key={scheme.id} className="scheme-preview-card" onClick={() => navigate('/home', { state: { prefillQuery: lang === 'hi' ? scheme.description_hi : scheme.description_en, lang } })}>
+                  <div className="scheme-preview-header">
+                    <h3 className="scheme-preview-title">{lang === 'hi' ? scheme.name_hi : scheme.name_en}</h3>
+                    <span className="scheme-preview-badge">
+                      {scheme.bpl_required ? (lang === 'hi' ? 'बीपीएल' : 'BPL') : (lang === 'hi' ? 'सभी के लिए' : 'Open to all')}
+                    </span>
+                  </div>
+                  <p className="scheme-preview-desc">
+                    {lang === 'hi' ? scheme.description_hi : scheme.description_en}
+                  </p>
+                  <div className="scheme-preview-footer">
+                    <span className="scheme-preview-docs">
+                      📋 {scheme.documents.length} {lang === 'hi' ? 'दस्तावेज़' : 'documents'}
+                    </span>
+                    <span className="scheme-preview-apply">
+                      📍 {lang === 'hi' ? 'आवेदन करें' : 'Apply at'} {scheme.apply_at.split(',')[0]}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="landing__section">
         <div className="landing__section-inner">
           <h2 className="landing__section-title">{t.howItWorks}</h2>
@@ -130,7 +164,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ── FEATURES ── */}
       <section className="landing__section landing__section--gray">
         <div className="landing__section-inner">
           <h2 className="landing__section-title">{t.features}</h2>
@@ -146,7 +179,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ── FINAL CTA BANNER ── */}
       <section className="landing__cta-banner">
         <h2 className="landing__cta-banner-title">
           {lang === 'hi' ? 'आज ही शुरू करें — यह मुफ़्त है' : 'Start Now — It\'s Completely Free'}
@@ -156,7 +188,7 @@ export default function Landing() {
             ? 'कोई पंजीकरण नहीं। कोई शुल्क नहीं। सिर्फ मदद।'
             : 'No registration. No fees. Just help.'}
         </p>
-        <button className="landing__cta landing__cta--white" onClick={() => navigate('/')}>
+        <button className="landing__cta landing__cta--white" onClick={() => navigate('/home')}>
           {t.landingCta}
         </button>
       </section>

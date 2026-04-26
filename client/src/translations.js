@@ -14,6 +14,10 @@ const translations = {
     stateLabel: 'State',
     pincodeLabel: 'Pincode',
     pincodeHint: '(for nearest hospitals)',
+    ageLabel: 'Age',
+    ageHint: '(optional)',
+    genderLabel: 'Gender',
+    genderHint: '(optional)',
     incomeLabel: 'Annual Income ₹',
     incomeHint: '(optional)',
     bplLabel: 'BPL Cardholder',
@@ -23,7 +27,7 @@ const translations = {
     errorPincode: 'Pincode must be exactly 6 digits.',
 
     // Trust strip
-    trust1: '6+ Schemes Covered',
+    trust1: '50+ Schemes Covered',
     trust2: 'Verified Hospitals',
     trust3: '100% Free Service',
     trust4: 'Hindi + English',
@@ -97,6 +101,10 @@ const translations = {
     stateLabel: 'राज्य',
     pincodeLabel: 'पिनकोड',
     pincodeHint: '(नज़दीकी अस्पतालों के लिए)',
+    ageLabel: 'उम्र',
+    ageHint: '(वैकल्पिक)',
+    genderLabel: 'लिंग',
+    genderHint: '(वैकल्पिक)',
     incomeLabel: 'वार्षिक आय ₹',
     incomeHint: '(वैकल्पिक)',
     bplLabel: 'BPL कार्डधारक',
@@ -106,7 +114,7 @@ const translations = {
     errorPincode: 'पिनकोड 6 अंकों का होना चाहिए।',
 
     // Trust strip
-    trust1: '6+ योजनाएं उपलब्ध',
+    trust1: '50+ योजनाएं उपलब्ध',
     trust2: 'सत्यापित अस्पताल',
     trust3: '100% मुफ़्त सेवा',
     trust4: 'हिंदी + अंग्रेज़ी',
